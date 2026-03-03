@@ -10,8 +10,8 @@ import { getAuth } from 'firebase/auth';
 import { getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBTzfgL8X8UBeKTDRzA72C6hO2mC1O-p5Q",
-    authDomain: "real-time-bidding-site.firebaseapp.com",
+    apiKey: import.meta.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: import.meta.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
     projectId: "real-time-bidding-site",
     storageBucket: "real-time-bidding-site.firebasestorage.app",
     messagingSenderId: "589243546973",
