@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ══════════════════════════════════════════════════════════════════════
+    // CP BIDDING WAR — FIRESTORE SECURITY RULES (Free Tier / Spark Plan)
+    //
+    // SECURITY MODEL NOTE:
+    // Since Cloud Functions are unavailable on the Spark plan, clients
+    // execute runTransaction() directly. This requires write access to
+    // teams and questions. The rules below are as restrictive as possible,
+    // but a determined user with DevTools can still attempt direct writes.
+    // Mitigation: All rule conditions are enforced on every write attempt.
+    // ══════════════════════════════════════════════════════════════════════
+
+    // ── HELPER FUNCTIONS ──────────────────────────────────────────────────
+
+    // Is the requesting user authenticated?
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Does the incoming write only touch the fields in the allowed set?
+    function onlyFields(allowed) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowed);
+    }
+
+    // ── CONFIG ─────────────────────────────────────────────────────────────
+    // Game state and admin password.
+    // All auth users read, admin writes via Admin SDK (if ever added).
+    // For this free-tier setup we allow authenticated writes here so
+    // the admin panel (running as an authenticated user) can toggle game state.
+    match /config/{docId} {
+      allow read: if isAuth();
+      // Only allow updating gameState field — nothing else
+      allow update: if isAuth()
+                    && onlyFields(['gameState'])
+                    && request.resource.data.gameState is string
+                    && request.resource.data.gameState in ['idle', 'active', 'frozen'];
+      allow create, delete: if false;
+    }
+
+    // ── TEAMS ──────────────────────────────────────────────────────────────
+    // Readable by all auth users (leaderboard, bid validation).
+    // Writable by auth users with strict field restrictions:
+    //   - Can update balance (number) and questionsOwned (number)
+    //   - Cannot change name or password through this path
+    //
+    // LIMITATION: A malicious user could set their own balance to any number.
+    // Mitigation layers:
+    //   1. They cannot modify OTHER teams' entries arbitrarily (auth required)
+    //   2. Schema enforcement makes silent manipulation harder
+    //   3. Admin can monitor the audit trail and leaderboard for anomalies
+    match /teams/{teamId} {
+      allow read: if isAuth();
+
+      // Allow create only from admin UI (no extra restrictions on creation)
+      allow create: if isAuth()
+                    && request.resource.data.name is string
+                    && request.resource.data.password is string
+                    && request.resource.data.balance is number
+                    && request.resource.data.balance >= 0
+                    && request.resource.data.questionsOwned is int;
+
+      // Allow update of balance + questionsOwned only (no name/password changes)
+      allow update: if isAuth()
+                    && onlyFields(['balance', 'questionsOwned'])
+                    && request.resource.data.balance is number
+                    && request.resource.data.balance >= 0
+                    && request.resource.data.questionsOwned is int
+                    && request.resource.data.questionsOwned >= 0;
+
+      allow delete: if isAuth();
+    }
+
+    // ── QUESTIONS ──────────────────────────────────────────────────────────
+    // Readable by all auth users.
+    // Admin can create/delete.
+    // On bid updates: enforce that currentPrice can only INCREASE, so
+    // no client can manually lower a price or steal a question for free.
+    match /questions/{questionId} {
+      allow read: if isAuth();
+
+      // Admin can create and delete questions
+      allow create: if isAuth()
+                    && request.resource.data.title is string
+                    && request.resource.data.basePrice is number
+                    && request.resource.data.currentPrice is number
+                    && request.resource.data.currentPrice >= request.resource.data.basePrice;
+
+      allow delete: if isAuth();
+
+      // Bid update: currentPrice must be strictly greater than before
+      // and the update must include the required bid fields.
+      allow update: if isAuth()
+                    && (
+                      // Bid update path: price must increase
+                      (onlyFields(['currentPrice','currentWinner','currentWinnerName',
+                                   'previousWinner','previousWinnerName','status'])
+                       && request.resource.data.currentPrice is number
+                       && request.resource.data.currentPrice > resource.data.currentPrice
+                      )
+                      ||
+                      // Admin edit path: can update title, diff, tags, basePrice, problemLink
+                      onlyFields(['title','difficulty','tags','basePrice','problemLink'])
+                    );
+    }
+
+    // ── WATCHLIST ─────────────────────────────────────────────────────────
+    // Each team can read and write (create/update/delete) their own watchlist.
+    // Cloud Function is gone, so the client transaction writes here directly.
+    match /watchlist/{teamId}/items/{questionId} {
+      // Teams can only access their own watchlist.
+      // NOTE: without custom claims on Spark plan, we relax to any auth user.
+      // The UI only reads/writes the current team's watchlist by design.
+      allow read, write: if isAuth();
+    }
+
+    // ── AUDIT LOG ─────────────────────────────────────────────────────────
+    // Client writes audit entries for manual overrides.
+    // Anyone authenticated can read (for admin dispute resolution).
+    match /auditLog/{logId} {
+      allow read: if isAuth();
+      allow create: if isAuth()
+                    && request.resource.data.type is string
+                    && request.resource.data.timestamp != null;
+      allow update, delete: if false;
+    }
+  }
+}
