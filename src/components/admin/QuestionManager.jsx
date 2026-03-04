@@ -68,8 +68,8 @@ export default function QuestionManager() {
 
     const diffBadge = { Easy: 'badge-easy', Medium: 'badge-medium', Hard: 'badge-hard' };
 
-    const FormInline = () => (
-        <tr style={{ background: 'rgba(0,245,255,0.05)' }}>
+    const renderFormInline = (key) => (
+        <tr key={key} style={{ background: 'rgba(0,245,255,0.05)' }}>
             <td className="p-2">
                 <input className="input" style={{ minWidth: 160 }} placeholder="Title"
                     value={form.title} onChange={e => fieldUpdate('title', e.target.value)} />
@@ -87,6 +87,9 @@ export default function QuestionManager() {
             <td className="p-2">
                 <input className="input" style={{ minWidth: 80 }} type="number" placeholder="100"
                     value={form.basePrice} onChange={e => fieldUpdate('basePrice', e.target.value)} />
+            </td>
+            <td className="p-2" colSpan={2}>
+                <span className="text-xs text-slate-500 italic opacity-50">Not editable</span>
             </td>
             <td className="p-2">
                 <input className="input" style={{ minWidth: 220 }} placeholder="https://codeforces.com/..."
@@ -128,9 +131,9 @@ export default function QuestionManager() {
                         </tr>
                     </thead>
                     <tbody>
-                        {showAdd && !editingId && <FormInline />}
+                        {showAdd && !editingId && renderFormInline('new-question')}
                         {questions.map(q => editingId === q.id ? (
-                            <FormInline key={q.id} />
+                            renderFormInline(q.id)
                         ) : (
                             <tr key={q.id}>
                                 <td style={{ color: '#e2e8f0', fontWeight: 600, maxWidth: 180 }} className="truncate">
