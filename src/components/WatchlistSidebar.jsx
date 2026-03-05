@@ -5,7 +5,7 @@ import { useWatchlist } from '../hooks/useWatchlist';
 import { useGame } from '../context/GameContext';
 
 export default function WatchlistSidebar({ onReBid }) {
-    const { items, dismiss, outbidCount, winningCount } = useWatchlist();
+    const { items, dismiss } = useWatchlist();
     const { questions, isActive } = useGame();
     const [collapsed, setCollapsed] = useState(false);
 
@@ -14,6 +14,10 @@ export default function WatchlistSidebar({ onReBid }) {
         const q = questions.find(q => q.id === item.questionId);
         return { ...item, question: q };
     }).filter(item => item.question); // only show items where question still exists
+
+    // Calculate derived counts strictly from existing questions
+    const outbidCount = enriched.filter(i => i.status === 'outbid').length;
+    const winningCount = enriched.filter(i => i.status === 'winning').length;
 
     if (collapsed) {
         return (
