@@ -44,6 +44,9 @@ export default function QuestionCard({
 
                 <div className="flex flex-wrap gap-1">
                     <span className={`badge ${diff.cls}`}>{diff.label}</span>
+                    <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.15)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
+                        <Zap size={10} style={{ marginRight: 2 }} /> {question.rewardValue ?? 0} pts
+                    </span>
                     {(question.tags ?? []).slice(0, 2).map(t => (
                         <span key={t} className="badge badge-tag">{t}</span>
                     ))}
@@ -84,6 +87,9 @@ export default function QuestionCard({
                 </div>
                 <div className="flex flex-wrap gap-1">
                     <span className={`badge ${diff.cls}`} style={{ opacity: 0.4 }}>{diff.label}</span>
+                    <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.1)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.2)', opacity: 0.6 }}>
+                        <Zap size={10} style={{ marginRight: 2 }} /> {question.rewardValue ?? 0} pts
+                    </span>
                 </div>
                 <div className="mt-auto pt-2 text-xs font-mono" style={{ color: '#334155' }}>
                     Closed · Won by {question.currentWinnerName ?? 'another team'}
@@ -121,6 +127,9 @@ export default function QuestionCard({
 
                 <div className="flex flex-wrap gap-1">
                     <span className={`badge ${diff.cls}`}>{diff.label}</span>
+                    <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.15)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
+                        <Zap size={10} style={{ marginRight: 2 }} /> {question.rewardValue ?? 0} pts
+                    </span>
                     {(question.tags ?? []).slice(0, 2).map(t => (
                         <span key={t} className="badge badge-tag">{t}</span>
                     ))}
@@ -184,6 +193,9 @@ export default function QuestionCard({
 
                 <div className="flex flex-wrap gap-1">
                     <span className={`badge ${diff.cls}`}>{diff.label}</span>
+                    <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.15)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
+                        <Zap size={10} style={{ marginRight: 2 }} /> {question.rewardValue ?? 0} pts
+                    </span>
                     {(question.tags ?? []).slice(0, 2).map(t => (
                         <span key={t} className="badge badge-tag">{t}</span>
                     ))}
@@ -241,6 +253,9 @@ export default function QuestionCard({
 
             <div className="flex flex-wrap gap-1">
                 <span className={`badge ${diff.cls}`}>{diff.label}</span>
+                <span className="badge" style={{ background: 'rgba(255, 215, 0, 0.15)', color: '#ffd700', borderColor: 'rgba(255, 215, 0, 0.3)' }}>
+                    <Zap size={10} style={{ marginRight: 2 }} /> {question.rewardValue ?? 0} pts
+                </span>
                 {(question.tags ?? []).slice(0, 3).map(t => (
                     <span key={t} className="badge badge-tag">{t}</span>
                 ))}

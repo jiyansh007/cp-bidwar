@@ -101,8 +101,8 @@ service cloud.firestore {
                        && request.resource.data.currentPrice > resource.data.currentPrice
                       )
                       ||
-                      // Admin edit path: can update title, diff, tags, basePrice, problemLink
-                      onlyFields(['title','difficulty','tags','basePrice','problemLink'])
+                      // Admin edit path: can update title, diff, tags, basePrice, rewardValue, problemLink
+                      onlyFields(['title','difficulty','tags','basePrice','rewardValue','problemLink'])
                     );
     }
 
