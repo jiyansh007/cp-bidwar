@@ -5,6 +5,7 @@ import { db } from '../../firebase/config';
 import { Plus, Pencil, Trash2, Check, X, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useGame } from '../../context/GameContext';
+import { useAdminDeletion } from '../../hooks/useAdminDeletion';
 
 const BLANK = {
     title: '', difficulty: 'Medium', tags: '', basePrice: 100,
@@ -18,6 +19,7 @@ export default function QuestionManager() {
     const [form, setForm] = useState(BLANK);
     const [showAdd, setShowAdd] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { deleteQuestionWithRefunds, isDeleting } = useAdminDeletion();
 
     const fieldUpdate = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
@@ -62,8 +64,7 @@ export default function QuestionManager() {
 
     const handleDelete = async (id) => {
         if (!confirm('Delete this question and all its bids?')) return;
-        await deleteDoc(doc(db, 'questions', id));
-        toast.success('Question deleted.');
+        await deleteQuestionWithRefunds(id);
     };
 
     const diffBadge = { Easy: 'badge-easy', Medium: 'badge-medium', Hard: 'badge-hard' };
@@ -165,7 +166,7 @@ export default function QuestionManager() {
                                             <Pencil size={11} />
                                         </button>
                                         <button className="btn btn-danger" style={{ padding: '4px 8px', fontSize: 11 }}
-                                            onClick={() => handleDelete(q.id)}>
+                                            onClick={() => handleDelete(q.id)} disabled={isDeleting}>
                                             <Trash2 size={11} />
                                         </button>
                                     </div>
