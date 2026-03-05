@@ -73,17 +73,23 @@ export default function BidModal({ question, onClose }) {
                 )}
 
                 {/* Price info */}
-                <div className="grid grid-cols-2 gap-3 mb-5">
-                    <div className="p-3 rounded-lg" style={{ background: '#0a1628', border: '1px solid #1e3a5f' }}>
-                        <p className="text-xs font-mono" style={{ color: '#475569' }}>CURRENT PRICE</p>
-                        <p className="text-xl font-bold font-mono mt-1" style={{ color: '#ffd700' }}>
-                            <Zap size={14} className="inline mr-1" style={{ verticalAlign: 'middle' }} />
+                <div className="grid grid-cols-3 gap-3 mb-5">
+                    <div className="p-3 rounded-lg flex flex-col items-center text-center justify-center" style={{ background: '#0a1628', border: '1px solid #1e3a5f' }}>
+                        <p className="text-[10px] font-mono" style={{ color: '#475569' }}>POTENTIAL REWARD</p>
+                        <p className="text-lg font-bold font-mono mt-1" style={{ color: '#00ff88' }}>
+                            <Zap size={12} className="inline mr-1" style={{ verticalAlign: 'middle' }} />
+                            {question.rewardValue ?? 0} pts
+                        </p>
+                    </div>
+                    <div className="p-3 rounded-lg flex flex-col items-center text-center justify-center" style={{ background: '#0a1628', border: '1px solid #1e3a5f' }}>
+                        <p className="text-[10px] font-mono" style={{ color: '#475569' }}>CURRENT PRICE</p>
+                        <p className="text-lg font-bold font-mono mt-1" style={{ color: '#ffd700' }}>
                             {question.currentPrice} pts
                         </p>
                     </div>
-                    <div className="p-3 rounded-lg" style={{ background: '#0a1628', border: '1px solid #1e3a5f' }}>
-                        <p className="text-xs font-mono" style={{ color: '#475569' }}>YOUR BALANCE</p>
-                        <p className="text-xl font-bold font-mono mt-1" style={{ color: maxBid < minBid ? '#ff3366' : '#00f5ff' }}>
+                    <div className="p-3 rounded-lg flex flex-col items-center text-center justify-center" style={{ background: '#0a1628', border: '1px solid #1e3a5f' }}>
+                        <p className="text-[10px] font-mono" style={{ color: '#475569' }}>YOUR BALANCE</p>
+                        <p className="text-lg font-bold font-mono mt-1" style={{ color: maxBid < minBid ? '#ff3366' : '#00f5ff' }}>
                             {currentTeam?.balance ?? 0} pts
                         </p>
                     </div>

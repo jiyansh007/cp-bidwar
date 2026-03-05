@@ -9,7 +9,7 @@ import { useAdminDeletion } from '../../hooks/useAdminDeletion';
 
 const BLANK = {
     title: '', difficulty: 'Medium', tags: '', basePrice: 100,
-    currentPrice: 100, problemLink: '', status: 'open',
+    currentPrice: 100, rewardValue: 500, problemLink: '', status: 'open',
     currentWinner: null, currentWinnerName: null, previousWinner: null,
 };
 
@@ -25,7 +25,7 @@ export default function QuestionManager() {
 
     const startEdit = (q) => {
         setEditingId(q.id);
-        setForm({ ...q, tags: (q.tags ?? []).join(', ') });
+        setForm({ ...q, rewardValue: q.rewardValue ?? 0, tags: (q.tags ?? []).join(', ') });
         setShowAdd(false);
     };
     const cancelEdit = () => { setEditingId(null); setForm(BLANK); };
@@ -34,6 +34,7 @@ export default function QuestionManager() {
         ...form,
         tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
         basePrice: Number(form.basePrice),
+        rewardValue: Number(form.rewardValue),
         currentPrice: editingId ? form.currentPrice : Number(form.basePrice),
     });
 
@@ -46,7 +47,7 @@ export default function QuestionManager() {
             if (editingId) {
                 await updateDoc(doc(db, 'questions', editingId), {
                     title: data.title, difficulty: data.difficulty, tags: data.tags,
-                    basePrice: data.basePrice, problemLink: data.problemLink,
+                    basePrice: data.basePrice, rewardValue: data.rewardValue, problemLink: data.problemLink,
                 });
                 toast.success('Question updated.');
                 cancelEdit();
@@ -89,6 +90,10 @@ export default function QuestionManager() {
                 <input className="input" style={{ minWidth: 80 }} type="number" placeholder="100"
                     value={form.basePrice} onChange={e => fieldUpdate('basePrice', e.target.value)} />
             </td>
+            <td className="p-2">
+                <input className="input" style={{ minWidth: 80 }} type="number" placeholder="500"
+                    value={form.rewardValue} onChange={e => fieldUpdate('rewardValue', e.target.value)} />
+            </td>
             <td className="p-2" colSpan={2}>
                 <span className="text-xs text-slate-500 italic opacity-50">Not editable</span>
             </td>
@@ -128,7 +133,7 @@ export default function QuestionManager() {
                     <thead>
                         <tr>
                             <th>Title</th><th>Diff</th><th>Tags</th><th>Base</th>
-                            <th>Current</th><th>Winner</th><th>Link</th><th>Actions</th>
+                            <th>Reward</th><th>Current</th><th>Winner</th><th>Link</th><th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -145,6 +150,7 @@ export default function QuestionManager() {
                                     {(q.tags ?? []).join(', ')}
                                 </td>
                                 <td className="font-mono">{q.basePrice}</td>
+                                <td className="font-mono text-neon-green">{q.rewardValue ?? 0}</td>
                                 <td className="font-mono" style={{ color: q.currentPrice > q.basePrice ? '#ffd700' : '' }}>
                                     {q.currentPrice}
                                 </td>
